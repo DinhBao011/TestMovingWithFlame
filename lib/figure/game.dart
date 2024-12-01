@@ -1,100 +1,66 @@
 import 'package:flame/game.dart';
-import 'package:flame/components.dart';
-import 'package:flame/input.dart';
-import 'package:flutter/material.dart';
+import 'package:test_move_flame/Action/action.dart';
+import 'package:test_move_flame/figure/button.dart';
+import 'package:test_move_flame/figure/player.dart';
 
 class MyGame extends FlameGame {
   late final Player player;
-  final double speed = 100;
+  final double speed = 300;
+  final double gravity = 400, jumpSpeed = -500;
 
-  // Trạng thái của các nút di chuyển
+  // Trạng thái của các nút điều khiển
   bool isMovingLeft = false;
   bool isMovingRight = false;
 
+  double groundY = 0.0; // Tọa độ y của mặt đất
+
   @override
   Future<void> onLoad() async {
-    // Khởi tạo player ở vị trí trung tâm màn hình với kích thước 50x50
+    // Xác định mặt đất (groundY)
+    groundY = size.y - 200;
+
+    // Khởi tạo player
     player = Player()
-      ..position = size / 2
+      ..position = Vector2(size.x / 2, groundY)
       ..size = Vector2.all(50);
     add(player);
 
-    // Tạo nút di chuyển trái
+    // Thêm các nút điều khiển
     add(createButton(
       text: '<',
       position: Vector2(50, size.y - 100),
-      direction: Vector2(-1, 0),
-      onPressed: () => isMovingLeft = true, // Khi nhấn giữ, update trạng thái
-      onReleased: () => isMovingLeft = false, // Khi nhả nút, dừng di chuyển
+      onPressed: () => isMovingLeft = true,
+      onReleased: () => isMovingLeft = false,
     ));
 
-    // Tạo nút di chuyển phải
     add(createButton(
       text: '>',
       position: Vector2(150, size.y - 100),
-      direction: Vector2(1, 0),
-      onPressed: () => isMovingRight = true, // Khi nhấn giữ, update trạng thái
-      onReleased: () => isMovingRight = false, // Khi nhả nút, dừng di chuyển
+      onPressed: () => isMovingRight = true,
+      onReleased: () => isMovingRight = false,
+    ));
+
+    add(createButton(
+      text: 'jump',
+      position: Vector2(size.x / 2 + 500, size.y - 100),
+      onPressed: () => jump(player, jumpSpeed, groundY),
     ));
   }
-
-  // Hàm tạo nút di chuyển để tránh lặp lại code
-  HudButtonComponent createButton({
-    required String text,
-    required Vector2 position,
-    required Vector2 direction,
-    required VoidCallback onPressed,
-    required VoidCallback onReleased,
-  }) {
-    return HudButtonComponent(
-      button: TextComponent(
-        text: text,
-        textRenderer:
-            TextPaint(style: const TextStyle(color: Colors.blue, fontSize: 24)),
-      ),
-      onPressed: onPressed,
-      onReleased: onReleased, // Sử dụng lastDt ở đây
-      position: position,
-      size: Vector2.all(50),
-    );
-  }
-
-  // Hàm di chuyển nhân vật theo hướng nhất định
-  void movePlayer(Vector2 direction, double dt) {
-    // Tính toán vị trí mới của player
-    Vector2 newPosition = player.position + direction * speed * dt;
-
-    // Giới hạn vị trí trong màn hình
-    newPosition.clamp(Vector2.zero(), size - player.size);
-
-    // Cập nhật vị trí mới của player
-    player.position = newPosition;
-  }
-
-  // Để lưu giá trị dt của frame cuối cùng
-  double lastDt = 0.0;
 
   @override
   void update(double dt) {
     super.update(dt);
-    lastDt = dt; // Lưu lại giá trị dt mới nhất để sử dụng khi nhấn nút
 
-    //Di chuyển khi các nút được nhấn giữ
+    // Di chuyển nhân vật trái/phải
     if (isMovingLeft) {
-      movePlayer(Vector2(-1, 0), dt);
+      movePlayer(Vector2(-1, 0), dt, speed, player, size);
     }
 
     if (isMovingRight) {
-      movePlayer(Vector2(1, 0), dt);
+      movePlayer(Vector2(1, 0), dt, speed, player, size);
     }
-  }
-}
 
-// Vẽ player trên canvas
-class Player extends PositionComponent {
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.drawRect(size.toRect(), Paint()..color = Colors.blue);
+    // Áp dụng trọng lực và cập nhật vị trí
+    applyGravity(player, gravity, dt, groundY);
   }
 }

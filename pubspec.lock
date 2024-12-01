@@ -61,18 +61,18 @@ packages:
     dependency: "direct main"
     description:
       name: flame
-      sha256: baafe5c38075b60577db05e0421c12941695b246547d9aca95166def3f29e57f
+      sha256: c02390443e40a2a9034ac867d0789ab32f215eba4779bff4655a7143eb3d75d0
       url: "https://pub.dev"
     source: hosted
-    version: "1.21.0"
+    version: "1.22.0"
   flame_rive:
     dependency: "direct main"
     description:
       name: flame_rive
-      sha256: f71328cf36ef637a39f94dd900f9018ca14d3b67cc0b2f43b43a7e952e78bddd
+      sha256: "35fb5cdd4a776b0a375807605d9da128c9752bb3a29dbc9c1385031ac0ac8e6f"
       url: "https://pub.dev"
     source: hosted
-    version: "1.10.5"
+    version: "1.10.6"
   flutter:
     dependency: "direct main"
     description: flutter
