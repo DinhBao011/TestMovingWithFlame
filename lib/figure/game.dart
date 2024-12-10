@@ -42,7 +42,7 @@ class MyGame extends FlameGame {
 
     add(createButton(
       text: 'jump',
-      position: Vector2(size.x / 2 + 500, size.y - 100),
+      position: Vector2(size.x / 2 + 300, size.y - 100),
       onPressed: () => jump(player, jumpSpeed, groundY),
     ));
   }
